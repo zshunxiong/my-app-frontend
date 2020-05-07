@@ -1,6 +1,7 @@
 import React from 'react';
 import InputArea from './components/InputArea';
 import TableArea from './components/TableArea';
+import API_URL from './config';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 class App extends React.Component {
@@ -19,7 +20,7 @@ class App extends React.Component {
     // this.setState(prevState => ({
     //   data: [...prevState.data, newData]
     // }))
-    fetch('http://localhost:5000/crud', {
+    fetch(API_URL + '/crud', {
       method: 'post',
       headers: {
         'Content-Type': 'application/json'
@@ -45,7 +46,7 @@ class App extends React.Component {
     // })
     let confirmDelete = window.confirm('Delete item forever?')
     if (confirmDelete) {
-      fetch('http://localhost:5000/crud', {
+      fetch(API_URL + '/crud', {
         method: 'delete',
         headers: {
           'Content-Type': 'application/json'
@@ -65,7 +66,7 @@ class App extends React.Component {
   }
 
   getData = () => {
-    fetch('http://localhost:5000/crud')
+    fetch(API_URL + '/crud')
       .then(response => response.json())
       .then(res => {
         if (res.success) {
