@@ -1,7 +1,7 @@
 import React from 'react';
 import InputArea from './components/InputArea';
 import TableArea from './components/TableArea';
-import API_URL from './config';
+import {API_URL} from './config';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 class App extends React.Component {
