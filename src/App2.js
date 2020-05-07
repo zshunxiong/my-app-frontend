@@ -1,18 +1,24 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import Modal from 'react-bootstrap/Modal';
+import Button from 'react-bootstrap/Button';
 import InputArea from './components/InputArea';
 import TableArea from './components/TableArea';
-import {API_URL} from './config';
+import { API_URL } from './config';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-class App extends React.Component {
-  constructor() {
-    super();
-    this.state = {
-      data: []
-    }
+function App() {
+  const [data, setData] = useState([]);
+  const [modalData, setModalData] = useState(null);
+  const [show, setShow] = useState(false);
+
+  const handleClose = () => setShow(false);
+
+  const showModal = (data) => {
+    setModalData(data);
+    setShow(true);
   }
 
-  addData = () => {
+  const addData = () => {
     let name = document.getElementById('name').value;
     let age = document.getElementById('age').value;
     let email = document.getElementById('email').value;
@@ -30,7 +36,8 @@ class App extends React.Component {
       .then(response => response.json())
       .then(res => {
         if (res.success) {
-          this.getData();
+          handleClose();
+          getData();
         } else {
           alert(res.msg)
         }
@@ -38,7 +45,35 @@ class App extends React.Component {
       .catch(err => console.log(err))
   }
 
-  delData = (id) => {
+  const updData = () => {
+    let id = modalData.id;
+    let name = document.getElementById('name').value;
+    let age = document.getElementById('age').value;
+    let email = document.getElementById('email').value;
+    let newData = { id, name, age, email };
+    // this.setState(prevState => ({
+    //   data: [...prevState.data, newData]
+    // }))
+    fetch(API_URL + '/crud', {
+      method: 'put',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(newData)
+    })
+      .then(response => response.json())
+      .then(res => {
+        if (res.success) {
+          handleClose();
+          getData();
+        } else {
+          alert(res.msg)
+        }
+      })
+      .catch(err => console.log(err))
+  }
+
+  const delData = (id) => {
     // 刪除的方法很特別，這裡是做過濾的動作，讓 data 跑迴圈，
     // 查到刪除對象後不把它加入新的 data，就可以把它從 data 中移除了
     // this.setState({
@@ -56,7 +91,7 @@ class App extends React.Component {
         .then(response => response.json())
         .then(res => {
           if (res.success) {
-            this.getData();
+            getData();
           } else {
             alert(res.msg)
           }
@@ -65,14 +100,12 @@ class App extends React.Component {
     }
   }
 
-  getData = () => {
+  const getData = () => {
     fetch(API_URL + '/crud')
       .then(response => response.json())
       .then(res => {
         if (res.success) {
-          this.setState({
-            data: res.data
-          })
+          setData(res.data)
         } else {
           alert(res.msg)
         }
@@ -80,20 +113,35 @@ class App extends React.Component {
       .catch(err => console.log(err))
   }
 
-  componentDidMount() {
-    this.getData();
-  }
+  useEffect(() => {
+    getData();
+  }, []);
 
-  render() {
-    return (
-      <div className="container">
-        <div className="row">
-          <InputArea addData={this.addData} />
-          <TableArea data={this.state.data} delData={this.delData} />
-        </div>
+  return (
+    <div className="container">
+      <div className="row">
+        <TableArea data={data} delData={delData} showModal={showModal} />
+        <button type="button" className="btn btn-primary" onClick={() => showModal(null)}>新增</button>
       </div>
-    );
-  }
+
+      <Modal show={show} onHide={handleClose}>
+        <Modal.Header closeButton>
+          <Modal.Title>{modalData ? '修改資料' : '新增資料'}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <InputArea modalData={modalData} />
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleClose}>
+            取消
+          </Button>
+          <Button variant="primary" onClick={modalData ? updData : addData}>
+            {modalData ? '儲存' : '新增'}
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    </div>
+  );
 }
 
 export default App;
