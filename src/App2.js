@@ -1,145 +1,79 @@
-import React, { useState, useEffect } from 'react';
-import Modal from 'react-bootstrap/Modal';
-import Button from 'react-bootstrap/Button';
-import InputArea from './components/InputArea';
-import TableArea from './components/TableArea';
-import { API_URL } from './config';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import React, { useState } from 'react';
+import logo from './logo.svg';
+import 'bootstrap/dist/css/bootstrap.min.css'; // 新增這行
+// import './App.css'; 目前沒用到
 
 function App() {
+  // 這是 React 的寫法，宣告有一個狀態 名叫 data，setData 是控制該狀態的 function名
   const [data, setData] = useState([]);
-  const [modalData, setModalData] = useState(null);
-  const [show, setShow] = useState(false);
-
-  const handleClose = () => setShow(false);
-
-  const showModal = (data) => {
-    setModalData(data);
-    setShow(true);
-  }
-
   const addData = () => {
     let name = document.getElementById('name').value;
     let age = document.getElementById('age').value;
     let email = document.getElementById('email').value;
     let newData = { name, age, email };
-    // this.setState(prevState => ({
-    //   data: [...prevState.data, newData]
-    // }))
-    fetch(API_URL + '/crud', {
-      method: 'post',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(newData)
-    })
-      .then(response => response.json())
-      .then(res => {
-        if (res.success) {
-          handleClose();
-          getData();
-        } else {
-          alert(res.msg)
-        }
-      })
-      .catch(err => console.log(err))
+    setData(prevState => [...prevState, newData]);
   }
 
-  const updData = () => {
-    let id = modalData.id;
-    let name = document.getElementById('name').value;
-    let age = document.getElementById('age').value;
-    let email = document.getElementById('email').value;
-    let newData = { id, name, age, email };
-    // this.setState(prevState => ({
-    //   data: [...prevState.data, newData]
-    // }))
-    fetch(API_URL + '/crud', {
-      method: 'put',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(newData)
-    })
-      .then(response => response.json())
-      .then(res => {
-        if (res.success) {
-          handleClose();
-          getData();
-        } else {
-          alert(res.msg)
-        }
-      })
-      .catch(err => console.log(err))
-  }
-
-  const delData = (id) => {
+  const delData = (name) => {
     // 刪除的方法很特別，這裡是做過濾的動作，讓 data 跑迴圈，
     // 查到刪除對象後不把它加入新的 data，就可以把它從 data 中移除了
-    // this.setState({
-    //   data: this.state.data.filter(row => row.name !== name)
-    // })
-    let confirmDelete = window.confirm('Delete item forever?')
-    if (confirmDelete) {
-      fetch(API_URL + '/crud', {
-        method: 'delete',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ id })
-      })
-        .then(response => response.json())
-        .then(res => {
-          if (res.success) {
-            getData();
-          } else {
-            alert(res.msg)
-          }
-        })
-        .catch(err => console.log(err))
-    }
+    setData(data.filter(row => row.name !== name));
   }
-
-  const getData = () => {
-    fetch(API_URL + '/crud')
-      .then(response => response.json())
-      .then(res => {
-        if (res.success) {
-          setData(res.data)
-        } else {
-          alert(res.msg)
-        }
-      })
-      .catch(err => console.log(err))
-  }
-
-  useEffect(() => {
-    getData();
-  }, []);
 
   return (
     <div className="container">
       <div className="row">
-        <TableArea data={data} delData={delData} showModal={showModal} />
-        <button type="button" className="btn btn-primary" onClick={() => showModal(null)}>新增</button>
+        <div className="col-sm-6">
+          <div className="row">
+            <div className="col-sm-12">
+              <div className="form-group">
+                <label htmlFor="name">姓名:</label>
+                <input type="text" className="form-control" id="name" />
+              </div>
+            </div>
+            <div className="col-sm-12">
+              <div className="form-group">
+                <label htmlFor="age">年龄:</label>
+                <input type="text" className="form-control" id="age" />
+              </div>
+            </div>
+            <div className="col-sm-12">
+              <div className="form-group">
+                <label htmlFor="email">E-Mail:</label>
+                <input type="text" className="form-control" id="email" />
+              </div>
+            </div>
+          </div>
+          <button type="button" className="btn btn-primary" onClick={addData}>新增</button>
+        </div>
+        <div className="col-sm-6">
+          <table className="table table-striped">
+            <thead>
+              <tr>
+                <th>姓名</th>
+                <th>年龄</th>
+                <th>E-Mail</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id='content'>
+              {/* 這裡要改成會迴圈跑出 data 的資料 */}
+              {data.map((row, index) => {
+                return (
+                  <tr key={index}>
+                    <td>{row.name}</td>
+                    <td>{row.age}</td>
+                    <td>{row.email}</td>
+                    <td>
+                      <button type='button' className='btn btn-danger' onClick={() => delData(row.name)}>刪除</button>
+                    </td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+        </div>
       </div>
-
-      <Modal show={show} onHide={handleClose}>
-        <Modal.Header closeButton>
-          <Modal.Title>{modalData ? '修改資料' : '新增資料'}</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <InputArea modalData={modalData} />
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleClose}>
-            取消
-          </Button>
-          <Button variant="primary" onClick={modalData ? updData : addData}>
-            {modalData ? '儲存' : '新增'}
-          </Button>
-        </Modal.Footer>
-      </Modal>
     </div>
   );
 }
