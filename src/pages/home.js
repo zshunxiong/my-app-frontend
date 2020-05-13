@@ -139,15 +139,11 @@ function Home(props) {
     sessionStorage.removeItem('token');
     props.history.push('./');
   }
-
+  
   useEffect(() => {
     getData();
   }, []);
-
-  // session 內沒有 token
-  if (token === null) {
-    return `Token 認證失敗，請重新登入`
-  }
+  
 
   return (
     <div className="container">
