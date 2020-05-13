@@ -8,7 +8,7 @@ function TableArea (props) {
       <table className="table table-striped">
         <thead>
           <tr>
-            <th>姓名測試版</th>
+            <th>姓名</th>
             <th>年龄</th>
             <th>E-Mail</th>
             <th></th>

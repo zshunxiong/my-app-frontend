@@ -6,7 +6,7 @@ import TableArea from '../components/TableArea';
 import { API_URL } from '../config';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-function Home() {
+function Home(props) {
   // 取得 JWT
   const token = sessionStorage.getItem('token');
   const [data, setData] = useState([]);
@@ -42,7 +42,10 @@ function Home() {
           handleClose();
           getData();
         } else {
-          alert(res.msg)
+          alert(res.msg);
+          if (res.redirect) {
+            logout();
+          }
         }
       })
       .catch(err => console.log(err))
@@ -71,7 +74,10 @@ function Home() {
           handleClose();
           getData();
         } else {
-          alert(res.msg)
+          alert(res.msg);
+          if (res.redirect) {
+            logout();
+          }
         }
       })
       .catch(err => console.log(err))
@@ -98,7 +104,10 @@ function Home() {
           if (res.success) {
             getData();
           } else {
-            alert(res.msg)
+            alert(res.msg);
+            if (res.redirect) {
+              logout();
+            }
           }
         })
         .catch(err => console.log(err))
@@ -117,10 +126,18 @@ function Home() {
         if (res.success) {
           setData(res.data)
         } else {
-          alert(res.msg)
+          alert(res.msg);
+          if(res.redirect) {
+            logout();
+          }
         }
       })
       .catch(err => console.log(err))
+  }
+
+  const logout = () => {
+    sessionStorage.removeItem('token');
+    props.history.push('./');
   }
 
   useEffect(() => {
@@ -129,14 +146,17 @@ function Home() {
 
   // session 內沒有 token
   if (token === null) {
-    return `認證失敗，請重新登入`
+    return `Token 認證失敗，請重新登入`
   }
 
   return (
     <div className="container">
       <div className="row">
         <TableArea data={data} delData={delData} showModal={showModal} />
-        <button type="button" className="btn btn-primary" onClick={() => showModal(null)}>新增</button>
+        <div className="col d-flex justify-content-between">
+          <button type="button" className="btn btn-primary" onClick={() => showModal(null)}>新增</button>
+          <button type="button" className="btn btn-secondary" onClick={logout}>登出</button>
+        </div>
       </div>
 
       <Modal show={show} onHide={handleClose}>
