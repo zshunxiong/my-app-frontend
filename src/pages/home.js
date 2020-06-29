@@ -3,7 +3,7 @@ import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import InputArea from '../components/InputArea';
 import TableArea from '../components/TableArea';
-import { API_URL } from '../config';
+import { config } from '../config';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 function Home(props) {
@@ -28,7 +28,7 @@ function Home(props) {
     // this.setState(prevState => ({
     //   data: [...prevState.data, newData]
     // }))
-    fetch(API_URL + '/crud', {
+    fetch(config.API_URL + '/crud', {
       method: 'post',
       headers: {
         'Content-Type': 'application/json',
@@ -60,7 +60,7 @@ function Home(props) {
     // this.setState(prevState => ({
     //   data: [...prevState.data, newData]
     // }))
-    fetch(API_URL + '/crud', {
+    fetch(config.API_URL + '/crud', {
       method: 'put',
       headers: {
         'Content-Type': 'application/json',
@@ -91,7 +91,7 @@ function Home(props) {
     // })
     let confirmDelete = window.confirm('Delete item forever?')
     if (confirmDelete) {
-      fetch(API_URL + '/crud', {
+      fetch(config.API_URL + '/crud', {
         method: 'delete',
         headers: {
           'Content-Type': 'application/json',
@@ -115,7 +115,7 @@ function Home(props) {
   }
 
   const getData = () => {
-    fetch(API_URL + '/crud', {
+    fetch(config.API_URL + '/crud', {
       method: 'get',
       headers: {
         'Content-Type': 'application/json',

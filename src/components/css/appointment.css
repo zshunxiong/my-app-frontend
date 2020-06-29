@@ -1,0 +1,15 @@
+/* appointment.js */
+.card .list-group .list-group-item {
+  background-color: #eee;
+}
+
+/* AppointmentModalBody */
+.deviceArea > div {
+  margin-bottom: 10px;
+}
+.deviceArea .card .card-body {
+  padding: 0.55rem;
+}
+.deviceArea .card .card-body .device_left{
+  width: 100px;
+}

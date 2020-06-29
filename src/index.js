@@ -2,6 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import MyRouter from './Router';
 import * as serviceWorker from './serviceWorker';
+//init React-dates
+import 'react-dates/initialize';
 
 ReactDOM.render(<MyRouter/>, document.getElementById('root'));
 

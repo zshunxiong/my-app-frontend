@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect} from 'react';
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
-import Card from 'react-bootstrap/Card'
-import { API_URL } from './config';
+import Card from 'react-bootstrap/Card';
+import { config } from './config';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import 'rc-time-picker/assets/index.css';
 import './App.css';
 
 function App(props) {
@@ -14,7 +15,7 @@ function App(props) {
     let account = document.getElementById('regis_account').value;
     let password = document.getElementById('regis_password').value;
     let data = { account, password };
-    fetch(API_URL + '/register', {
+    fetch(config.API_URL + '/register', {
       method: 'post',
       headers: {
         'Content-Type': 'application/json'
@@ -35,7 +36,7 @@ function App(props) {
     let account = document.getElementById('login_account').value;
     let password = document.getElementById('login_password').value;
     let data = { account, password };
-    fetch(API_URL + '/login', {
+    fetch(config.API_URL + '/login', {
       method: 'post',
       headers: {
         'Content-Type': 'application/json'
@@ -52,6 +53,43 @@ function App(props) {
       })
       .catch(err => console.log(err))
   }
+
+  const UserAuth = () => {
+    let account = document.getElementById('login_account').value;
+    let password = document.getElementById('login_password').value;
+    let sid = sessionStorage.getItem('sid');
+    fetch(config.API_URL + `/APPAPI/UserAuth.aspx?sid=${sid}&account=${account}&password=${password}&lang=zhtw&restype=json`, {
+      method: 'get',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    }).then(response => response.json())
+      .then(res => {
+        if (res[0].resdata[0].authid) {
+          sessionStorage.setItem('authid', res[0].resdata[0].authid);
+          props.history.push('space/info')
+        } else {
+          alert('認證失敗');
+        }
+        console.log(res);
+      })
+      .catch(err => console.log(err))
+  }
+
+  const DeviceAuth = () => {
+    fetch(config.API_URL + `/APPAPI/DeviceAuth.aspx?account=${config.Device_Auth_Acc}&password=${config.Device_Auth_Pass}&restype=json`, {
+      method: 'get',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    }).then(response => response.json())
+      .then(res => {
+        sessionStorage.setItem('sid', res[0].resdata[0].sid);
+      })
+      .catch(err => console.log(err))
+  }
+
+  useEffect(DeviceAuth, []);
 
   return (
     <div className="main">
@@ -77,7 +115,7 @@ function App(props) {
         </Card.Body>
         <Card.Footer className="d-flex justify-content-between">
           <Button variant="secondary" onClick={toggleModal}>註冊</Button>
-          <Button variant="primary" onClick={login}>登入</Button>
+          <Button variant="primary" onClick={UserAuth}>登入</Button>
         </Card.Footer>
       </Card>
 
