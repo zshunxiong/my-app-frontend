@@ -14,6 +14,7 @@ function AppointmentModal(props) {
   const [etime, setEtime] = useState("00:00");
   // s1 state
   const [s1data, setS1data] = useState(null);
+  const [s1checked, setS1checked] = useState('');
   // s2 state
   const [s2data, setS2data] = useState(null);
 
@@ -41,6 +42,7 @@ function AppointmentModal(props) {
           props.setSession(false);
         } else {
           if (res[0].resdata) {
+            setS1checked('');
             setS1data(res[0].resdata);
             setStage(1);
           } else {
@@ -55,6 +57,7 @@ function AppointmentModal(props) {
     if (document.querySelector('input[name="deviceid"]:checked')) {
       let urlparam = '';
       const deviceid = document.querySelector('input[name="deviceid"]:checked').value;
+      setS1checked(deviceid);
       if (qtype === 'date') {
         urlparam = `/APPAPI/BookTimeSegQuery.aspx?sid=${sid}&authid=${authid}&spacetype=${props.selectedzone.spacetype}&deviceid=${deviceid}&sdate=${sdate.format('YYYY/MM/DD')}&edate=${edate.format('YYYY/MM/DD')}&restype=json`;
       } else if (qtype === 'time') {
@@ -80,6 +83,42 @@ function AppointmentModal(props) {
     }
   }
 
+  const BookAdd = (qtype) => {
+    let confirmAdd = window.confirm('確定預約？')
+    if (confirmAdd) {
+      let urlparam = '';
+      let bookvalue = '';
+      const userid = sessionStorage.getItem('userid');
+      const checkboxes = document.getElementsByName('bookvalue');
+      for (let i = 0, n = checkboxes.length; i < n; i++) {
+        if (checkboxes[i].checked) {
+          bookvalue += "," + checkboxes[i].value;
+        }
+      }
+      if (bookvalue) bookvalue = bookvalue.substring(1);
+      if (qtype === 'date') {
+        urlparam = `/APPAPI/BookAdd.aspx?sid=${sid}&authid=${authid}&spacetype=${props.selectedzone.spacetype}&deviceid=${s1checked}&userid=${userid}&bookdate=${bookvalue}&restype=json`;
+      } else if (qtype === 'time') {
+        urlparam = `/APPAPI/BookAdd.aspx?sid=${sid}&authid=${authid}&spacetype=${props.selectedzone.spacetype}&deviceid=${s1checked}&userid=${userid}&sdate=${sdate.format('YYYY/MM/DD')}&booktime=${bookvalue}&restype=json`;
+      }
+      fetch(config.API_URL + urlparam, {
+        method: 'get',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }).then(response => response.json())
+        .then(res => {
+          if (res[0].rescode === '3' || res[0].rescode === '4') {
+            props.setSession(false);
+          } else {
+            props.setshow(false);
+            alert('預約成功');
+          }
+        })
+        .catch(err => console.log(err))
+    }
+  }
+
   return (
     <Modal size='xl' show={props.show} onHide={() => props.setshow(false)}>
       <Modal.Header closeButton>
@@ -102,6 +141,7 @@ function AppointmentModal(props) {
         setSession={props.setSession}
         // s1 props
         s1data={s1data}
+        s1checked={s1checked}
         // s2 props
         s2data={s2data}
       />
@@ -112,6 +152,7 @@ function AppointmentModal(props) {
         setshow={props.setshow}
         BookDeviceQuery={BookDeviceQuery}
         BookTimeSegQuery={BookTimeSegQuery}
+        BookAdd={BookAdd}
       />
     </Modal>
   )
@@ -132,6 +173,7 @@ function ModalBody(props) {
     modalForm[1] =
       <AppointmentDateS1
         data={props.s1data}
+        checked={props.s1checked}
       />;
     modalForm[2] =
       <AppointmentDateS2
@@ -153,6 +195,7 @@ function ModalBody(props) {
     modalForm[1] =
       <AppointmentTimeS1
         data={props.s1data}
+        checked={props.s1checked}
       />;
     modalForm[2] =
       <AppointmentTimeS2
@@ -202,7 +245,7 @@ function ModalFooter(props) {
           <Button variant="secondary" onClick={() => props.setStage(1)}>
             上一步
           </Button>
-          <Button variant="primary" onClick={() => props.setshow(false)}>
+          <Button variant="primary" onClick={() => props.BookAdd('date')}>
             確定預約
           </Button>
         </div>
@@ -240,7 +283,7 @@ function ModalFooter(props) {
           <Button variant="secondary" onClick={() => props.setStage(1)}>
             上一步
           </Button>
-          <Button variant="primary" onClick={() => props.setshow(false)}>
+          <Button variant="primary" onClick={() => props.BookAdd('time')}>
             確定預約
           </Button>
         </div>

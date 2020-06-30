@@ -66,6 +66,7 @@ function App(props) {
     }).then(response => response.json())
       .then(res => {
         if (res[0].resdata[0].authid) {
+          sessionStorage.setItem('userid', account);
           sessionStorage.setItem('authid', res[0].resdata[0].authid);
           props.history.push('space/info')
         } else {

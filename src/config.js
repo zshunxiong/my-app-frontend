@@ -1,6 +1,7 @@
 const config = {
   // API_URL: 'http://localhost:5000',
   // API_URL: 'https://my-app-backend-api.herokuapp.com',
+  BASE_NAME: '/',
   API_URL: 'https://211.22.252.73',
   Device_Auth_Acc: 'rwdDevice',
   Device_Auth_Pass: 'rwd89798198'

@@ -32,7 +32,6 @@ function AppointmentDateS0(props) {
             }}
             placeholder=''
             isOutsideRange={() => false}
-            numberOfMonths={1}
             displayFormat="YYYY/MM/DD"
             block
             readOnly
@@ -52,7 +51,6 @@ function AppointmentDateS0(props) {
             }}
             placeholder=''
             isOutsideRange={() => false}
-            numberOfMonths={1}
             displayFormat="YYYY/MM/DD"
             disabled
             block
@@ -177,7 +175,6 @@ function AppointmentTimeS0(props) {
             }}
             placeholder=''
             isOutsideRange={() => false}
-            numberOfMonths={1}
             displayFormat="YYYY/MM/DD"
             block
             readOnly
@@ -204,6 +201,10 @@ function AppointmentDateS1(props) {
   const handleCheck = (i) => {
     setChecked(i);
   }
+
+  useEffect(() => {
+    setChecked(props.checked);
+  }, []);
 
   return (
     <Row className="deviceArea">
@@ -238,6 +239,10 @@ function AppointmentTimeS1(props) {
   const handleCheck = (i) => {
     setChecked(i);
   }
+  
+  useEffect(() => {
+    setChecked(props.checked);
+  }, []);
 
   return (
     <Row className="deviceArea">
